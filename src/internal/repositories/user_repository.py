@@ -2,7 +2,7 @@ from logging import getLogger
 from typing import Optional
 from unittest import result
 
-from piano_site.internal.models.user_model import UserModel
+from src.internal.models.user_model import UserModel
 from sqlalchemy import update, select, delete
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession

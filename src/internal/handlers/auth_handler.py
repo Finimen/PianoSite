@@ -1,14 +1,16 @@
 from logging import getLogger
 from typing import List
 
+
 from fastapi import Depends
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordBearer
-from piano_site.cmd.di import get_auth_service
-from piano_site.internal.domain.user import UserResponse
-from piano_site.internal.models.user_create import UserCreate
-from piano_site.internal.models.user_login import UserLogin
-from piano_site.internal.services.auth_service import AuthService
+from src.internal.models.token import Token
+from src.core.di import get_auth_service
+from src.internal.domain.user import UserResponse
+from src.internal.models.user_create import UserCreate
+from src.internal.models.user_login import UserLogin
+from src.internal.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = getLogger('auth_handler')
@@ -27,7 +29,7 @@ async def register(user_data: UserCreate, auth_service: AuthService = Depends(ge
     
     return user
 
-@router.post("/login", response_model=UserResponse)
+@router.post("/login", response_model=Token)
 async def login(login_data: UserLogin, auth_service: AuthService = Depends(get_auth_service)):
     logger.info(f"login attemot for {login_data.name}")
 

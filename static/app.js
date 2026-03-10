@@ -6,12 +6,14 @@ class PianoPlayer {
         this.recordingStartTime = null;
         this.currentTrackId = 0;
         this.tracks = JSON.parse(localStorage.getItem('pianoTracks') || '[]');
+        this.cloudTracks = [];
+        this.token = localStorage.getItem('token');
+        this.currentUser = null;
         
         this.init();
     }
 
     async init() {
-        // Initialize audio context on user interaction
         document.addEventListener('click', () => {
             if (!this.audioContext) {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -20,6 +22,224 @@ class PianoPlayer {
 
         this.setupEventListeners();
         this.renderTracks();
+        this.setupAuth();
+        
+        if (this.token) {
+            await this.getCurrentUser();
+        }
+    }
+
+    setupAuth() {
+        // Tab switching
+        document.getElementById('loginTab').addEventListener('click', () => this.showAuthTab('login'));
+        document.getElementById('registerTab').addEventListener('click', () => this.showAuthTab('register'));
+        
+        // Form submissions
+        document.getElementById('loginBtn').addEventListener('click', () => this.login());
+        document.getElementById('registerBtn').addEventListener('click', () => this.register());
+        document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+        
+        // Enter key presses
+        document.getElementById('loginUsername').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.login();
+        });
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.login();
+        });
+        
+        document.getElementById('regUsername').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.register();
+        });
+        document.getElementById('regEmail').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.register();
+        });
+        document.getElementById('regPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.register();
+        });
+        document.getElementById('regConfirmPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.register();
+        });
+    }
+
+    showAuthTab(tab) {
+        document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+        document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+        document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+        document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+    }
+
+    showMessage(form, message, isSuccess) {
+        const msgEl = document.getElementById(form === 'login' ? 'loginMessage' : 'registerMessage');
+        msgEl.textContent = message;
+        msgEl.className = 'auth-message ' + (isSuccess ? 'success' : 'error');
+        
+        if (isSuccess) {
+            setTimeout(() => {
+                msgEl.textContent = '';
+                msgEl.className = 'auth-message';
+            }, 3000);
+        }
+    }
+
+    async register() {
+        const username = document.getElementById('regUsername').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regConfirmPassword').value;
+        
+        // Validation
+        if (!username || !email || !password || !confirmPassword) {
+            this.showMessage('register', 'Please fill all fields', false);
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            this.showMessage('register', 'Passwords do not match', false);
+            return;
+        }
+        
+        if (password.length < 8) {
+            this.showMessage('register', 'Password must be at least 8 characters', false);
+            return;
+        }
+        
+        try {
+            const response = await fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: username,
+                    email: email,
+                    password: password
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                this.showMessage('register', 'Registration successful! Please login.', true);
+                document.getElementById('regUsername').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirmPassword').value = '';
+                
+                // Switch to login tab after 1 second
+                setTimeout(() => this.showAuthTab('login'), 1000);
+            } else {
+                this.showMessage('register', data.detail || 'Registration failed', false);
+            }
+        } catch (error) {
+            this.showMessage('register', 'Network error. Please try again.', false);
+            console.error('Registration error:', error);
+        }
+    }
+
+    async login() {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!username || !password) {
+            this.showMessage('login', 'Please fill all fields', false);
+            return;
+        }
+        
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: username,
+                    password: password
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Store token
+                this.token = data.access_token;
+                localStorage.setItem('token', this.token);
+                
+                this.showMessage('login', 'Login successful!', true);
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                
+                // Get user info
+                await this.getCurrentUser();
+                
+                // Show user info
+                this.showUserInfo();
+            } else {
+                this.showMessage('login', data.detail || 'Login failed', false);
+            }
+        } catch (error) {
+            this.showMessage('login', 'Network error. Please try again.', false);
+            console.error('Login error:', error);
+        }
+    }
+
+    async getCurrentUser() {
+        if (!this.token) return;
+        
+        try {
+            const response = await fetch('/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+            
+            if (response.ok) {
+                this.currentUser = await response.json();
+                document.getElementById('welcomeUser').textContent = `Welcome, ${this.currentUser.name}!`;
+                this.showUserInfo();
+            } else {
+                // Token expired or invalid
+                this.logout();
+            }
+        } catch (error) {
+            console.error('Get user error:', error);
+        }
+    }
+
+    showUserInfo() {
+        document.querySelector('.auth-tabs').style.display = 'none';
+        document.getElementById('loginForm').classList.remove('active');
+        document.getElementById('registerForm').classList.remove('active');
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('saveTrackBtn').disabled = false;
+    }
+
+    async logout() {
+        try {
+            if (this.token) {
+                await fetch('/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            // Clear token regardless
+            this.token = null;
+            this.currentUser = null;
+            localStorage.removeItem('token');
+            
+            // Show auth forms
+            document.querySelector('.auth-tabs').style.display = 'flex';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('registerForm').classList.remove('active');
+            document.getElementById('saveTrackBtn').disabled = true;
+            
+            this.showAuthTab('login');
+        }
     }
 
     setupEventListeners() {
@@ -39,8 +259,18 @@ class PianoPlayer {
             });
         });
 
-        // Keyboard events
         document.addEventListener('keydown', (e) => {
+            // Check if the active element is an input field
+            const activeElement = document.activeElement;
+            const isInputField = activeElement.tagName === 'INPUT' || 
+                                activeElement.tagName === 'TEXTAREA' || 
+                                activeElement.isContentEditable;
+            
+            // Don't trigger piano if user is typing in an input field
+            if (isInputField) {
+                return;
+            }
+            
             const keyMap = {
                 'a': 'C', 'w': 'C#', 's': 'D', 'e': 'D#',
                 'd': 'E', 'f': 'F', 't': 'F#', 'g': 'G',
@@ -59,6 +289,17 @@ class PianoPlayer {
         });
 
         document.addEventListener('keyup', (e) => {
+            // Check if the active element is an input field
+            const activeElement = document.activeElement;
+            const isInputField = activeElement.tagName === 'INPUT' || 
+                                activeElement.tagName === 'TEXTAREA' || 
+                                activeElement.isContentEditable;
+            
+            // Don't trigger piano if user is typing in an input field
+            if (isInputField) {
+                return;
+            }
+            
             const keyMap = {
                 'a': 'C', 'w': 'C#', 's': 'D', 'e': 'D#',
                 'd': 'E', 'f': 'F', 't': 'F#', 'g': 'G',
