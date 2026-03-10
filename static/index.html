@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎹 Python Piano - Make Music!</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎹 Python Piano</h1>
+        <p class="subtitle">Use your keyboard (A-K) or click the keys!</p>
+        
+        <div class="piano-container">
+            <div class="piano">
+                <!-- White keys -->
+                <div class="key white" data-note="C">A</div>
+                <div class="key white" data-note="D">S</div>
+                <div class="key white" data-note="E">D</div>
+                <div class="key white" data-note="F">F</div>
+                <div class="key white" data-note="G">G</div>
+                <div class="key white" data-note="A">H</div>
+                <div class="key white" data-note="B">J</div>
+                <div class="key white" data-note="C2">K</div>
+                
+                <!-- Black keys (positioned absolutely) -->
+                <div class="key black" data-note="C#">W</div>
+                <div class="key black" data-note="D#">E</div>
+                <div class="key black" data-note="F#">T</div>
+                <div class="key black" data-note="G#">Y</div>
+                <div class="key black" data-note="A#">U</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="recordBtn" class="btn">⏺️ Record</button>
+            <button id="playBtn" class="btn" disabled>▶️ Play</button>
+            <button id="clearBtn" class="btn">🗑️ Clear</button>
+        </div>
+
+        <div class="recordings">
+            <h3>Your Melodies</h3>
+            <div id="tracks" class="tracks">
+                <!-- Recorded tracks will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
