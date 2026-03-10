@@ -3,85 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎹 Python Piano - Make Music!</title>
+    <title>Cursed Piano · Jujutsu Kaisen</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎹</text></svg>">
     <link rel="stylesheet" href="/static/style.css">
+    <!-- Fonts: Manga-style headings + clean sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:opsz@14..32&family=RocknRoll+One&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>🎹 Python Piano</h1>
-        
-        <!-- Registration/Login Section -->
-        <div class="auth-section">
-            <div class="auth-tabs">
-                <button class="auth-tab active" id="loginTab">Login</button>
-                <button class="auth-tab" id="registerTab">Register</button>
-            </div>
-            
-            <!-- Login Form -->
-            <div class="auth-form active" id="loginForm">
-                <h3>Welcome Back!</h3>
-                <input type="text" id="loginUsername" placeholder="Username" class="auth-input">
-                <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
-                <button class="auth-btn" id="loginBtn">Login</button>
-                <p class="auth-message" id="loginMessage"></p>
-            </div>
-            
-            <!-- Register Form -->
-            <div class="auth-form" id="registerForm">
-                <h3>Join the Music!</h3>
-                <input type="text" id="regUsername" placeholder="Username (3-20 chars)" class="auth-input">
-                <input type="email" id="regEmail" placeholder="Email" class="auth-input">
-                <input type="password" id="regPassword" placeholder="Password (min 8 chars)" class="auth-input">
-                <input type="password" id="regConfirmPassword" placeholder="Confirm Password" class="auth-input">
-                <button class="auth-btn" id="registerBtn">Register</button>
-                <p class="auth-message" id="registerMessage"></p>
-            </div>
-            
-            <!-- User Info (shown when logged in) -->
-            <div class="user-info" id="userInfo" style="display: none;">
-                <span id="welcomeUser"></span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
-            </div>
-        </div>
-        
-        <p class="subtitle">Use your keyboard (A-K) or click the keys!</p>
-        
-        <div class="piano-container">
-            <div class="piano">
-                <!-- White keys -->
-                <div class="key white" data-note="C">A</div>
-                <div class="key white" data-note="D">S</div>
-                <div class="key white" data-note="E">D</div>
-                <div class="key white" data-note="F">F</div>
-                <div class="key white" data-note="G">G</div>
-                <div class="key white" data-note="A">H</div>
-                <div class="key white" data-note="B">J</div>
-                <div class="key white" data-note="C2">K</div>
-                
-                <!-- Black keys -->
-                <div class="key black" data-note="C#">W</div>
-                <div class="key black" data-note="D#">E</div>
-                <div class="key black" data-note="F#">T</div>
-                <div class="key black" data-note="G#">Y</div>
-                <div class="key black" data-note="A#">U</div>
-            </div>
-        </div>
+    <!-- Manga background layers with purple tint -->
+    <div class="manga-bg"></div>
+    <div class="manga-bg-2"></div>
+    <div class="manga-bg-3"></div>
+    <div class="speed-lines"></div>
+    <div class="impact-burst"></div>
+    <div class="screentone"></div>
+    <div class="ink-splatter"></div>
 
-        <div class="controls">
-            <button id="recordBtn" class="btn">⏺️ Record</button>
-            <button id="playBtn" class="btn" disabled>▶️ Play</button>
-            <button id="clearBtn" class="btn">🗑️ Clear</button>
-            <button id="saveTrackBtn" class="btn" disabled>💾 Save to Cloud</button>
-        </div>
+    <main class="app">
+        <!-- Compact header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🎹</span>
+                <h1 class="logo-text">CURSED<br>PIANO</h1>
+                <div class="logo-badge">呪術廻戦</div>
+            </div>
+            <div class="user-area" id="userArea">
+                <div class="auth-container" id="authContainer"></div>
+                <div class="user-profile" id="userProfile" style="display: none;">
+                    <div class="user-avatar">
+                        <img src="https://via.placeholder.com/32x32/2d2d2d/ffffff?text=U" alt="Avatar">
+                    </div>
+                    <span class="user-name" id="welcomeUser"></span>
+                    <button class="btn-icon" id="logoutBtn" aria-label="Logout">
+                        <i data-feather="log-out"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-        <div class="recordings">
-            <h3>Your Melodies <span id="cloudTracksCount"></span></h3>
-            <div id="tracks" class="tracks">
-                <!-- Recorded tracks will appear here -->
+        <!-- Main piano section – centered and enlarged -->
+        <section class="piano-section">
+            <div class="section-header">
+                <h2>CHANNEL <span class="cursed-energy">CURSED ENERGY</span></h2>
+                <p class="key-hint">⚡ A–K / W–U ⚡</p>
+            </div>
+            <div class="piano-container">
+                <div class="piano">
+                    <!-- White keys -->
+                    <div class="key white" data-note="C">A</div>
+                    <div class="key white" data-note="D">S</div>
+                    <div class="key white" data-note="E">D</div>
+                    <div class="key white" data-note="F">F</div>
+                    <div class="key white" data-note="G">G</div>
+                    <div class="key white" data-note="A">H</div>
+                    <div class="key white" data-note="B">J</div>
+                    <div class="key white" data-note="C2">K</div>
+                    <!-- Black keys -->
+                    <div class="key black" data-note="C#">W</div>
+                    <div class="key black" data-note="D#">E</div>
+                    <div class="key black" data-note="F#">T</div>
+                    <div class="key black" data-note="G#">Y</div>
+                    <div class="key black" data-note="A#">U</div>
+                </div>
+            </div>
+
+            <!-- Control bar directly under piano -->
+            <div class="control-bar">
+                <div class="btn-group">
+                    <button id="recordBtn" class="btn btn-primary">
+                        <i data-feather="circle"></i> RECORD
+                    </button>
+                    <button id="playBtn" class="btn btn-secondary" disabled>
+                        <i data-feather="play"></i> PLAY
+                    </button>
+                    <button id="clearBtn" class="btn btn-outline">
+                        <i data-feather="trash-2"></i> CLEAR
+                    </button>
+                </div>
+                <button id="saveTrackBtn" class="btn btn-accent" disabled>
+                    <i data-feather="cloud"></i> SAVE TO DOMAIN
+                </button>
+            </div>
+        </section>
+
+        <!-- Recordings as compact manga panels -->
+        <section class="recordings-section">
+            <div class="section-header">
+                <h2>CURSED TECHNIQUES</h2>
+                <span class="badge" id="cloudTracksCount">0</span>
+            </div>
+            <div id="tracks" class="tracks-grid"></div>
+        </section>
+    </main>
+
+    <!-- Auth modal with torn-paper effect -->
+    <div class="modal-overlay" id="authModal" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">LOGIN</h3>
+                <button class="btn-icon close-modal" id="closeModal"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="input-group">
+                        <i data-feather="user" class="input-icon"></i>
+                        <input type="text" id="loginUsername" placeholder="USERNAME" class="input">
+                    </div>
+                    <div class="input-group">
+                        <i data-feather="lock" class="input-icon"></i>
+                        <input type="password" id="loginPassword" placeholder="PASSWORD" class="input">
+                    </div>
+                    <button type="button" id="loginBtn" class="btn btn-primary btn-block">ENTER DOMAIN</button>
+                    <p class="auth-message" id="loginMessage"></p>
+                    <p class="auth-switch">DON'T HAVE AN ACCOUNT? <a href="#" id="showRegister">AWAKEN</a></p>
+                </form>
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="input-group">
+                        <i data-feather="user" class="input-icon"></i>
+                        <input type="text" id="regUsername" placeholder="USERNAME (3-20)" class="input">
+                    </div>
+                    <div class="input-group">
+                        <i data-feather="mail" class="input-icon"></i>
+                        <input type="email" id="regEmail" placeholder="EMAIL" class="input">
+                    </div>
+                    <div class="input-group">
+                        <i data-feather="lock" class="input-icon"></i>
+                        <input type="password" id="regPassword" placeholder="PASSWORD (MIN 8)" class="input">
+                    </div>
+                    <div class="input-group">
+                        <i data-feather="lock" class="input-icon"></i>
+                        <input type="password" id="regConfirmPassword" placeholder="CONFIRM" class="input">
+                    </div>
+                    <button type="button" id="registerBtn" class="btn btn-primary btn-block">AWAKEN</button>
+                    <p class="auth-message" id="registerMessage"></p>
+                    <p class="auth-switch">ALREADY HAVE AN ACCOUNT? <a href="#" id="showLogin">LOGIN</a></p>
+                </form>
             </div>
         </div>
     </div>
 
+    <script src="/static/piano_engine.js"></script>
     <script src="/static/app.js"></script>
+    <script>feather.replace();</script>
 </body>
 </html>
